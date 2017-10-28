@@ -41,11 +41,18 @@ app.get('/Ylistele',Ylistele);//Yazi Listele
 app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi Güncelle
 app.get('/Ysil/:ID',Ysil);//Yazi sil
 
-
 var con = mysql.createConnection({
     host: "127.0.0.1",
     user: "phpmyadmin",
     password: "1234", 
+    database: "plakaapp_db"
+  });
+
+/*
+var con = mysql.createConnection({
+    host: "46.101.232.64",
+    user: "root",
+    password: "v2pXuX3ZqR5UWZGE", 
     database: "plakaapp_db"
   });
   
@@ -53,7 +60,7 @@ var con = mysql.createConnection({
     if (err) throw err;
     console.log("Connected!");
   });
-
+*/
 function listening(){
      console.log("Listening..");   
 
@@ -169,13 +176,17 @@ function Kgiris(req, res){
                 'warning': "with content type charset encoding will be added by default"
             });
             return res.json({
-                "id" : K_ID,
-                "admin" : Admin,
-                "adi" : K_Adi,
-                "rep" : K_Rep,
-                "mail" : K_Mail,
-                "soru" : K_Soru,
-                "cevap" : K_Cevap
+                "message":
+                {
+                    "id" : K_ID,
+                    "admin" : Admin,
+                    "adi" : K_Adi,
+                    "rep" : K_Rep,
+                    "mail" : K_Mail,
+                    "soru" : K_Soru,
+                    "cevap" : K_Cevap,
+                    "status" : "success"
+                }
             });
         }
 
