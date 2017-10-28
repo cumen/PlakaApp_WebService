@@ -40,15 +40,15 @@ app.get('/Yekle/:PlakaID/:YazarID/:KonumID/:Yazi',Yekle);//Yazi Ekle
 app.get('/Ylistele',Ylistele);//Yazi Listele
 app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi Güncelle
 app.get('/Ysil/:ID',Ysil);//Yazi sil
-
+/*
 var con = mysql.createConnection({
     host: "127.0.0.1",
     user: "phpmyadmin",
     password: "1234", 
     database: "plakaapp_db"
   });
+*/
 
-/*
 var con = mysql.createConnection({
     host: "46.101.232.64",
     user: "root",
@@ -60,7 +60,7 @@ var con = mysql.createConnection({
     if (err) throw err;
     console.log("Connected!");
   });
-*/
+
 function listening(){
      console.log("Listening..");   
 
