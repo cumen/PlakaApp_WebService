@@ -152,9 +152,10 @@ function Kgiris(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '4'
-                // 4 : Kullanıcı bilgileri yanlış
-                // 4 : Kullanıcı girişi başarısız
+                "kullanici":
+                {
+                    "durum" : "hata" //Kullanıcı varsa
+                }
             });
                     
         }
@@ -176,7 +177,7 @@ function Kgiris(req, res){
                 'warning': "with content type charset encoding will be added by default"
             });
             return res.json({
-                "message":
+                "kullanici":
                 {
                     "id" : K_ID,
                     "admin" : Admin,
@@ -185,7 +186,7 @@ function Kgiris(req, res){
                     "mail" : K_Mail,
                     "soru" : K_Soru,
                     "cevap" : K_Cevap,
-                    "status" : "success"
+                    "durum" : "basarili"
                 }
             });
         }
