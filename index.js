@@ -177,7 +177,7 @@ function Kgiris(req, res){
             res.json({
                 "message":
                 {
-                    "durum" : "1" //Kullanıcı varsa
+                    "durum" : "8" //Kullanıcı yoksa
                 }
             });
                     
