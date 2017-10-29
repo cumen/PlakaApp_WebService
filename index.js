@@ -91,7 +91,7 @@ function Kekle(req, res){
     
    K_Parola = crypto.createHash('md5').update(K_Parola).digest("hex");
 
-    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "'";
+    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "' and K_Adi ='" + K_Adi + "'";
     con.query(sql, function (error, results) {
         if (error){
             res.send({
