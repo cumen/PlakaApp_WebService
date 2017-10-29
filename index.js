@@ -285,11 +285,17 @@ function Kguncelle(req, res){
     var K_Mail = data.K_Mail.toLowerCase();
     var K_Soru = data.K_Soru;
     var K_Cevap = data.K_Cevap;
+    var bosmu = false;
+
+    if(K_Parola == "~~"){
+        bosmu = true;
+    }
+
     var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     
     K_Parola = crypto.createHash('md5').update(K_Parola).digest("hex");
 
-    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "' OR K_Adi ='" + K_Adi + "'";
+    var sql = "SELECT * from uyeler where ID =" + ID + "";
     con.query(sql, function (error, results) {
         if (error){
             res.send({
@@ -314,7 +320,32 @@ function Kguncelle(req, res){
             });
         }
         else{ // Kullanıcı varsa
-            var sql = "UPDATE uyeler SET Admin = '" + Admin + "', K_Adi = '" + K_Adi + "', K_Sifre = '" + K_Parola + "', K_Rep = '" + K_Rep + "', K_Mail = '" + K_Mail + "', K_Soru = '" + K_Soru + "', K_Cevap = '" + K_Cevap + "' where ID ='" + ID + "'";
+            var sql = "select * from uyeler where K_Mail ='"+K_Mail+"' or K_Adi = '"+K_Adi+"'";
+            con.query(sql, function (error, results) {
+                if (error){
+                    res.send({
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
+        
+                    });
+                }
+                if(results.length != 0){ //Kullanıcı mail veya adı benzerse
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    res.json({
+                        "message":
+                        {
+                            "durum" : "1" //Kayıt mevcut
+                        }
+                    });
+                }
+                else{
+            var sql = "UPDATE uyeler SET Admin = '" + Admin + "', K_Adi = '" + K_Adi + "', K_Rep = '" + K_Rep + "', K_Mail = '" + K_Mail + "', K_Soru = '" + K_Soru + "', K_Cevap = '" + K_Cevap + "'"+((bosmu)?"":", K_Sifre = '" + K_Parola + "'")+" where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
@@ -337,10 +368,11 @@ function Kguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
-            });    
-        }
-
+            });
+        }    
     });
+
+    }});
 }
 
 //Kullanıcı Sil
