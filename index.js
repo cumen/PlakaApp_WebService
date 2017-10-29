@@ -84,14 +84,14 @@ function Kekle(req, res){
     var data = req.params;
     var K_Adi = data.K_Adi;
     var K_Parola = data.K_Parola;
-    var K_Mail = data.K_Mail;
+    var K_Mail = data.K_Mail.toLowerCase();
     var K_Soru = data.K_Soru;
     var K_Cevap = data.K_Cevap;
     var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     
    K_Parola = crypto.createHash('md5').update(K_Parola).digest("hex");
 
-    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "' and K_Adi ='" + K_Adi + "'";
+    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "' OR K_Adi ='" + K_Adi + "'";
     con.query(sql, function (error, results) {
         if (error){
             res.send({
@@ -282,14 +282,14 @@ function Kguncelle(req, res){
     var K_Adi = data.K_Adi;
     var K_Parola = data.K_Parola;
     var K_Rep = data.K_Rep;
-    var K_Mail = data.K_Mail;
+    var K_Mail = data.K_Mail.toLowerCase();
     var K_Soru = data.K_Soru;
     var K_Cevap = data.K_Cevap;
     var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     
     K_Parola = crypto.createHash('md5').update(K_Parola).digest("hex");
 
-    var sql = "SELECT * from uyeler where ID ='" + ID + "'";
+    var sql = "SELECT * from uyeler where K_Mail ='" + K_Mail + "' OR K_Adi ='" + K_Adi + "'";
     con.query(sql, function (error, results) {
         if (error){
             res.send({
