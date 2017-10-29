@@ -40,6 +40,15 @@ app.get('/Yekle/:PlakaID/:YazarID/:KonumID/:Yazi',Yekle);//Yazi Ekle
 app.get('/Ylistele',Ylistele);//Yazi Listele
 app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi Güncelle
 app.get('/Ysil/:ID',Ysil);//Yazi sil
+
+
+var con = mysql.createConnection({
+    host: "127.0.0.1",
+    user: "root",
+    password: "v2pXuX3ZqR5UWZGE", 
+    database: "plakaapp_db"
+  });
+
 /*
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -48,14 +57,6 @@ var con = mysql.createConnection({
     database: "plakaapp_db"
   });
 */
-
-var con = mysql.createConnection({
-    host: "46.101.232.64",
-    user: "root",
-    password: "v2pXuX3ZqR5UWZGE", 
-    database: "plakaapp_db"
-  });
-  
   con.connect(function(err, q) {
     if (err) throw err;
     console.log("Connected!");
@@ -65,6 +66,16 @@ function listening(){
      console.log("Listening..");   
 
 }
+//--------------------------------------------
+
+/*
+            AÇIKLAMA
+durum = basarili    --->  İşlem başarılı
+durum = 99          --->  Sql hatası
+durum = 8           --->  Kayıt bulunmadı
+durum = 1           --->  Aynı kayıttan mevcut
+
+*/
 
 //--------------------------------------------
 
@@ -84,7 +95,10 @@ function Kekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
+                "message":
+                {
+                    "durum" : "99" 
+                }
                 // 99 : Error
 
             });
@@ -96,8 +110,10 @@ function Kekle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 2
-                        // 2 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -107,7 +123,10 @@ function Kekle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '0' //Veritabanına eklendi
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Veritabanına eklendi
                 }
                 res.json(reply);
             });    
@@ -119,8 +138,11 @@ function Kekle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '13'
-                // 13 : Kayıt Var
+                "message":
+                {
+                    "durum" : "1" 
+                }
+                // 1 : Kayıt Var
             });
         }
 
@@ -139,9 +161,10 @@ function Kgiris(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: 99
-                // 99 : Error
-
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
             });
         }
         if(results.length == 0){ //Giriş başarısızsa
@@ -154,7 +177,7 @@ function Kgiris(req, res){
             res.json({
                 "kullanici":
                 {
-                    "durum" : "hata" //Kullanıcı varsa
+                    "durum" : "1" //Kullanıcı varsa
                 }
             });
                     
@@ -177,7 +200,7 @@ function Kgiris(req, res){
                 'warning': "with content type charset encoding will be added by default"
             });
             return res.json({
-                "kullanici":
+                "message":
                 {
                     "id" : K_ID,
                     "admin" : Admin,
@@ -201,8 +224,10 @@ function Klistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -214,8 +239,10 @@ function Klistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Tablo Boş
+                "message":
+                {
+                    "durum" : "8" //Tablo boş
+                }
             });        
         }
         else{ //Tablo dolu ise
@@ -229,14 +256,15 @@ function Klistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "user" : {
+                    "message" : {
                         "ID" : results[key].ID,
                         "Admin" : results[key].Admin,
                         "K_Adi" : results[key].K_Adi,
                        "K_Rep" : results[key].K_Rep,
                         "K_Mail" : results[key].K_Mail,
                         "K_Soru" : results[key].K_Soru,
-                        "K_Cevap" : results[key].K_Cevap
+                        "K_Cevap" : results[key].K_Cevap,
+                        "durum" : "basarili"
                     }
                 }
                 bilgiler.push(item);
@@ -265,8 +293,10 @@ function Kguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -277,8 +307,10 @@ function Kguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
-                // 6 : Kullanıcı bulunamadı
+                "message":
+                {
+                    "durum" : "8" //Kayıt Bulunamdı
+                }
             });
         }
         else{ // Kullanıcı varsa
@@ -286,8 +318,10 @@ function Kguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -297,7 +331,10 @@ function Kguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -315,8 +352,10 @@ function Ksil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -327,8 +366,10 @@ function Ksil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
-                // 8 : Kullanıcı bulunamadı
+                "message":
+                {
+                    "durum" : "8" //Kayıt Bulunamadı
+                }
             });
         }
         else{ // Kullanıcı varsa
@@ -336,8 +377,10 @@ function Ksil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Kullanıcı Silindi");
@@ -347,7 +390,10 @@ function Ksil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" //Sql hatası
+                    } //Silme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -368,8 +414,10 @@ function Cekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -380,8 +428,10 @@ function Cekle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 11
-                        // 11 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -391,7 +441,10 @@ function Cekle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '12' //Veritabanına eklendi
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Veritabanına eklendi
                 }
                 res.json(reply);
             });    
@@ -403,8 +456,11 @@ function Cekle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '13'
-                // 13 : Cins var
+                "message":
+                {
+                    "durum" : "1" 
+                }
+                // 1 : Cins var
             });
         }
 
@@ -418,8 +474,10 @@ function Clistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -431,8 +489,10 @@ function Clistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Hiç Kulanıcı Yok
+                "message":
+                {
+                    "durum" : "8" //Kayıt bulunamadı
+                }
             });        
         }
         else{ //Tablo dolu ise
@@ -448,7 +508,8 @@ function Clistele(req, res){
                 var item={
                     "cins" : {
                         "ID" : results[key].ID,
-                        "AracCins" : results[key].AracCins
+                        "AracCins" : results[key].AracCins,
+                        "durum" : "basarili"
                     }
                 }
                 bilgiler.push(item);
@@ -469,8 +530,10 @@ function Cguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -481,8 +544,11 @@ function Cguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
-                // 6 : Kullanıcı bulunamadı
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Kullanıcı bulunamadı
             });
         }
         else{ // Kullanıcı varsa
@@ -492,8 +558,10 @@ function Cguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -503,7 +571,10 @@ function Cguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -521,8 +592,10 @@ function Csil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -533,8 +606,10 @@ function Csil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
-                // 8 :  Bulunamadı
+                "message":
+                {
+                    "durum" : "8" //Kayıt Bulunamadı
+                }
             });
         }
         else{ // Cins varsa
@@ -542,8 +617,10 @@ function Csil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Kullanıcı Silindi");
@@ -553,7 +630,10 @@ function Csil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Silme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -575,8 +655,10 @@ function Tekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -587,8 +669,10 @@ function Tekle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 11
-                        // 11 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -598,7 +682,10 @@ function Tekle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '12' //Veritabanına eklendi
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Veritabanına eklendi
                 }
                 res.json(reply);
             });    
@@ -610,8 +697,11 @@ function Tekle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '13'
-                // 13 :  Kayıt Mevcut
+                "message":
+                {
+                    "durum" : "1" 
+                }
+                // 1 :  Kayıt Mevcut
             });
         }
 
@@ -625,8 +715,10 @@ function Tlistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -638,8 +730,11 @@ function Tlistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Hiç Kulanıcı Yok
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Hiç Kulanıcı Yok
             });        
         }
         else{ //Tablo dolu ise
@@ -653,10 +748,11 @@ function Tlistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "tur" : {
+                    "message" : {
                         "ID" : results[key].ID,
                         "CinsID" : results[key].CinsID,
-                        "TurAdi" : results[key].TurAdi                        
+                        "TurAdi" : results[key].TurAdi,
+                        "durum" : "basarili"                        
                     }
                 }
                 bilgiler.push(item);
@@ -678,8 +774,10 @@ function Tguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -690,8 +788,10 @@ function Tguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
-                // 6 : Kayıt bulunamadı
+                "message":
+                {
+                    "durum" : "8" //Kayıt Bulunamadı
+                }
             });
         }
         else{ // Kayıt varsa
@@ -701,8 +801,10 @@ function Tguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -712,7 +814,10 @@ function Tguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -730,8 +835,10 @@ function Tsil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -742,7 +849,10 @@ function Tsil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
+                "message":
+                {
+                    "durum" : "8" 
+                }
                 // 8 : Kayıt Bulunamadı
             });
         }
@@ -751,8 +861,10 @@ function Tsil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Kullanıcı Silindi");
@@ -762,7 +874,10 @@ function Tsil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Silme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -787,8 +902,10 @@ function Pekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -799,8 +916,10 @@ function Pekle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 11
-                        // 11 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -810,7 +929,10 @@ function Pekle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '12' //Veritabanına eklendi
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Veritabanına eklendi
                 }
                 res.json(reply);
             });    
@@ -822,8 +944,10 @@ function Pekle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '13'
-                // 13 :  Kayıt Mevcut
+                "message":
+                {
+                    "durum" : "99" 
+                }// 1 : Kayıt Mevcut
             });
         }
 
@@ -837,8 +961,10 @@ function Plistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -850,8 +976,11 @@ function Plistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Hiç Kulanıcı Yok
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Hiç Kulanıcı Yok
             });        
         }
         else{ //Tablo dolu ise
@@ -865,12 +994,13 @@ function Plistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "tur" : {
+                    "message" : {
                         "ID" : results[key].ID,
                         "Plaka" : results[key].Plaka,                        
                         "CinsID" : results[key].CinsID,
                         "TurID" : results[key].TurID,
-                        "AracRengi" : results[key].AracRengi,                        
+                        "AracRengi" : results[key].AracRengi, 
+                        "durum" : "basarili"                       
                     }
                 }
                 bilgiler.push(item);
@@ -894,8 +1024,10 @@ function Pguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -906,8 +1038,11 @@ function Pguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
-                // 6 : Kayıt bulunamadı
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Kayıt bulunamadı
             });
         }
         else{ // Kayıt varsa
@@ -917,8 +1052,10 @@ function Pguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -928,7 +1065,10 @@ function Pguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -946,8 +1086,10 @@ function Psil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -958,7 +1100,10 @@ function Psil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
+                "message":
+                {
+                    "durum" : "8" 
+                }
                 // 8 : Kayıt Bulunamadı
             });
         }
@@ -967,8 +1112,10 @@ function Psil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Kayıt Silindi");
@@ -978,7 +1125,10 @@ function Psil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Silme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -999,8 +1149,10 @@ function Soruekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1011,8 +1163,10 @@ function Soruekle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 11
-                        // 11 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -1022,7 +1176,10 @@ function Soruekle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '12' //Veritabanına eklendi
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Veritabanına eklendi
                 }
                 res.json(reply);
             });    
@@ -1034,8 +1191,11 @@ function Soruekle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '13'
-                // 13 : Kayıt var
+                "message":
+                {
+                    "durum" : "1" 
+                }
+                // 1 : Kayıt var
             });
         }
 
@@ -1049,8 +1209,10 @@ function Sorulistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1062,8 +1224,11 @@ function Sorulistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Hiç Kayıt Yok
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Hiç Kayıt Yok
             });        
         }
         else{ //Tablo dolu ise
@@ -1077,9 +1242,10 @@ function Sorulistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "soru" : {
+                    "message" : {
                         "ID" : results[key].ID,
-                        "SoruMetin" : results[key].SoruMetin
+                        "SoruMetin" : results[key].SoruMetin,
+                        "durum" : "basarili"
                     }
                 }
                 bilgiler.push(item);
@@ -1100,8 +1266,10 @@ function Soruguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1112,8 +1280,11 @@ function Soruguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
-                // 6 : Kayıt bulunamadı
+                "message":
+                {
+                    "durum" : "8" 
+                }
+                // 8 : Kayıt bulunamadı
             });
         }
         else{ // Kayıt varsa
@@ -1123,8 +1294,10 @@ function Soruguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -1134,7 +1307,10 @@ function Soruguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -1152,8 +1328,10 @@ function Sorusil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1164,7 +1342,10 @@ function Sorusil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
+                "message":
+                {
+                    "durum" : "8" 
+                }
                 // 8 :  Bulunamadı
             });
         }
@@ -1173,8 +1354,10 @@ function Sorusil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Kayıt Silindi");
@@ -1184,7 +1367,10 @@ function Sorusil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Silme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -1212,8 +1398,10 @@ function Yekle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: 11
-                // 11 : Sql hatası
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
             });
         }
         console.log("Veritabanina yazildi");
@@ -1223,7 +1411,10 @@ function Yekle(req, res){
             'warning': "with content type charset encoding will be added by default"
             });
         reply = {
-            sonuc: '12' //Veritabanına eklendi
+            "message":
+            {
+                "durum" : "basarili" //Veritabanına yazıldı
+            }
         }
         res.json(reply);
     });    
@@ -1237,8 +1428,10 @@ function Ylistele(req, res){
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
-                sonuc: '99'
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1250,8 +1443,10 @@ function Ylistele(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '5'
-                // 5 : Hiç Kayıt Yok
+                "message":
+                {
+                    "durum" : "8" //Kayıt Bulunmadı
+                }
             });        
         }
         else{ //Tablo dolu ise
@@ -1265,14 +1460,15 @@ function Ylistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "yazi" : {
+                    "message" : {
                         "ID" : results[key].ID,
                         "PlakaID" : results[key].PlakaID,
                         "YazarID" : results[key].YazarID,
                         "KonumID" : results[key].KonumID,
                         "Yazi" : results[key].Yazi,
                         "Rep" : results[key].Rep,
-                        "YazilmaTarih" : results[key].YazilmaTarih, 
+                        "YazilmaTarih" : results[key].YazilmaTarih,
+                        "durum" : "basarili" 
                     }
                 }
                 bilgiler.push(item);
@@ -1296,9 +1492,10 @@ function Yguncelle(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
-
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
             });
         }
         if(results.length == 0){ //Kayıt yoksa
@@ -1308,7 +1505,10 @@ function Yguncelle(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '6'
+                "message":
+                {
+                    "durum" : "8" 
+                }
                 // 6 : Kayıt bulunamadı
             });
         }
@@ -1319,8 +1519,10 @@ function Yguncelle(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 3
-                        // 3 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //Sql hatası
+                        }
                     });
                 }
                 console.log("Veritabanina yazildi");
@@ -1330,7 +1532,10 @@ function Yguncelle(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '7' //Güncelleme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" 
+                    } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
             });    
@@ -1348,8 +1553,10 @@ function Ysil(req, res){
     con.query(sql, function (error, results) {
         if (error){
             res.send({
-                sonuc: 99
-                // 99 : Error
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
 
             });
         }
@@ -1360,8 +1567,10 @@ function Ysil(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                sonuc: '8'
-                // 8 :  Bulunamadı
+                "message":
+                {
+                    "durum" : "8" //Kayıt bulunamdı
+                }
             });
         }
         else{ // Cins varsa
@@ -1369,8 +1578,11 @@ function Ysil(req, res){
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
-                        sonuc: 9
-                        // 9 : Sql hatası
+                        "message":
+                        {
+                            "durum" : "99" //sql hatası
+                        }
+                        
                     });
                 }
                 console.log("Kayıt Silindi");
@@ -1380,7 +1592,10 @@ function Ysil(req, res){
                     'warning': "with content type charset encoding will be added by default"
                  });
                 reply = {
-                    sonuc: '10' //Silme işlemi başarılı
+                    "message":
+                    {
+                        "durum" : "basarili" //silme işlemi başarılı
+                    }
                 }
                 res.json(reply);
             });    
