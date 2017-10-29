@@ -175,7 +175,7 @@ function Kgiris(req, res){
                 'warning': "with content type charset encoding will be added by default"
              });
             res.json({
-                "kullanici":
+                "message":
                 {
                     "durum" : "1" //Kullanıcı varsa
                 }
@@ -506,7 +506,7 @@ function Clistele(req, res){
             var bilgiler = [];
             for (var key in results) {
                 var item={
-                    "cins" : {
+                    "message" : {
                         "ID" : results[key].ID,
                         "AracCins" : results[key].AracCins,
                         "durum" : "basarili"
