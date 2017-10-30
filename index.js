@@ -41,6 +41,8 @@ app.get('/Ylistele',Ylistele);//Yazi Listele
 app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi Güncelle
 app.get('/Ysil/:ID',Ysil);//Yazi sil
 
+app.get('/Ilistele',Ilistele);//İller Listele
+
 
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -1633,5 +1635,59 @@ function Ysil(req, res){
             });    
         }
 
+    });
+}
+
+//--------------------------------------------
+
+//İller Listele
+function Ilistele(req, res){
+    var data = req.params;
+    var sql = "SELECT * from Iller;"   
+    con.query(sql, function (error, results) {
+        if (error){
+            return res.send({
+                "message":
+                {
+                    "durum" : "99" //Sql hatası
+                }
+
+            });
+        }
+        if(results.length == 0){ //Tablo boş ise
+                
+            res.set({
+                'content-type': 'application/json',
+                'content-length': '100',
+                'warning': "with content type charset encoding will be added by default"
+             });
+            res.json({
+                "message":
+                {
+                    "durum" : "8" //Kayıt bulunamadı
+                }
+            });        
+        }
+        else{ //Tablo dolu ise
+            console.log("Tablo dolu");
+            //kullanıcı bilgilerinin alınması
+            res.set({
+                'content-type': 'application/json',
+                'content-length': '100',
+                'warning': "with content type charset encoding will be added by default"
+            });
+            var bilgiler = [];
+            for (var key in results) {
+                var item={
+                    "message" : {
+                        "il_kodu" : results[key].il_kodu,
+                        "il_adi" : results[key].il_adi,
+                        "durum" : "basarili"
+                    }
+                }
+                bilgiler.push(item);
+            }
+            res.json(bilgiler);  
+        }
     });
 }
