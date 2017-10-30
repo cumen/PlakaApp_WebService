@@ -320,7 +320,7 @@ function Kguncelle(req, res){
             });
         }
         else{ // Kullanıcı varsa
-            var sql = "select * from uyeler where K_Mail ='"+K_Mail+"' or K_Adi = '"+K_Adi+"'";
+            var sql = "select * from uyeler where (K_Mail ='"+K_Mail+"' or K_Adi = '"+K_Adi+"') AND NOT ID="+ID;
             con.query(sql, function (error, results) {
                 if (error){
                     res.send({
