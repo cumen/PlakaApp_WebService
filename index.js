@@ -41,14 +41,15 @@ app.get('/Ysil/:ID',Ysil);//Yazi sil
 
 app.get('/Ilistele',Ilistele);//İller Listele
 
-
+function GetConnection(){
 var con = mysql.createConnection({
     host: "127.0.0.1",
     user: "root",
     password: "v2pXuX3ZqR5UWZGE", 
     database: "plakaapp_db"
   });
-
+  return con;
+}
 /*
 function GetConnection(){
     var con = mysql.createConnection({
