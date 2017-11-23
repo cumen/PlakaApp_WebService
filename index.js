@@ -1,5 +1,3 @@
-console.log("deneme");
-
 var express = require('express');
 var moment = require('moment');
 var mysql = require('mysql');
@@ -52,18 +50,16 @@ var con = mysql.createConnection({
   });
 
 /*
-var con = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "phpmyadmin",
-    password: "1234", 
-    database: "plakaapp_db"
-  });
-*/
-  con.connect(function(err, q) {
-    if (err) throw err;
-    console.log("Connected!");
-  });
-
+function GetConnection(){
+    var con = mysql.createConnection({
+        host: "127.0.0.1",
+        user: "phpmyadmin",
+        password: "1234", 
+        database: "plakaapp_db"
+      });
+    return con;
+}
+ */
 function listening(){
      console.log("Listening..");   
 
@@ -74,15 +70,21 @@ function listening(){
             AÇIKLAMA
 durum = basarili    --->  İşlem başarılı
 durum = 99          --->  Sql hatası
-durum = 8           --->  Kayıt bulunmadı
+durum = 8           --->  Kayıt bulunamadı
 durum = 1           --->  Aynı kayıttan mevcut
 
 */
 
 //--------------------------------------------
 
-//Kullanıcı ekleme fonksiyonu
+//Kullanıcı Ekle 
 function Kekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var K_Adi = data.K_Adi;
     var K_Parola = data.K_Parola;
@@ -118,7 +120,6 @@ function Kekle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -149,10 +150,20 @@ function Kekle(req, res){
         }
 
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
-//Giriş Kontrol Fonksiyonu
+//Giriş Kontrol 
 function Kgiris(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var K_Parola = data.K_Parola;
     var K_Mail = data.K_Mail;
@@ -185,8 +196,6 @@ function Kgiris(req, res){
                     
         }
         else{ //Giriş başarlıysa
-            console.log("Giriş Başarılı");
-
             //kullanıcı bilgilerinin alınması
                     var K_ID = results[0].ID;
                     var Admin = results[0].Admin;
@@ -217,10 +226,20 @@ function Kgiris(req, res){
         }
 
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Kullanıcı Listele
 function Klistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+    
     var data = req.params;
     var sql = "SELECT * from uyeler;"   
     con.query(sql, function (error, results) {
@@ -248,7 +267,6 @@ function Klistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -274,10 +292,20 @@ function Klistele(req, res){
             res.json(bilgiler);  
         }
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Kullanıcı Güncelle
 function Kguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Admin = data.Admin;
@@ -357,7 +385,6 @@ function Kguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -375,10 +402,19 @@ function Kguncelle(req, res){
     });
 
     }});
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Kullanıcı Sil
 function Ksil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -417,7 +453,6 @@ function Ksil(req, res){
                         }
                     });
                 }
-                console.log("Kullanıcı Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -434,12 +469,21 @@ function Ksil(req, res){
         }
 
     });
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //--------------------------------------------
 
 //Cins Ekle
 function Cekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var Cins = data.AracCins;
     Cins = Cins.toUpperCase();
@@ -468,7 +512,6 @@ function Cekle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -499,10 +542,20 @@ function Cekle(req, res){
         }
 
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Cins Listele
 function Clistele(req, res){
+    
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+      
     var data = req.params;
     var sql = "SELECT * from cinsler;"   
     con.query(sql, function (error, results) {
@@ -530,7 +583,6 @@ function Clistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -551,10 +603,19 @@ function Clistele(req, res){
             res.json(bilgiler);  
         }
     });
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Cins Güncelle
 function Cguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Cins = data.AracCins;
@@ -598,7 +659,6 @@ function Cguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -615,10 +675,19 @@ function Cguncelle(req, res){
         }
 
     });
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Cins Sil
 function Csil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -657,7 +726,6 @@ function Csil(req, res){
                         }
                     });
                 }
-                console.log("Kullanıcı Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -674,12 +742,22 @@ function Csil(req, res){
         }
 
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //--------------------------------------------
 
 //Tür Ekle
 function Tekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var cinsID = data.CinsID
     var tur = data.TurAdi;
@@ -709,7 +787,6 @@ function Tekle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -740,10 +817,19 @@ function Tekle(req, res){
         }
 
     });
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Tür Listele
 function Tlistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var sql = "SELECT * from turler;"   
     con.query(sql, function (error, results) {
@@ -772,7 +858,6 @@ function Tlistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -794,10 +879,20 @@ function Tlistele(req, res){
             res.json(bilgiler);  
         }
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Tür Güncelle
 function Tguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Cins = data.CinsID;
@@ -841,7 +936,6 @@ function Tguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -858,10 +952,19 @@ function Tguncelle(req, res){
         }
 
     });
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Tür Sil
 function Tsil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -901,7 +1004,6 @@ function Tsil(req, res){
                         }
                     });
                 }
-                console.log("Kullanıcı Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -918,12 +1020,22 @@ function Tsil(req, res){
         }
 
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //---------------------------------------------
 
 //Plaka Ekle
 function Pekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Plaka = data.Plaka;
@@ -956,7 +1068,6 @@ function Pekle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -986,10 +1097,20 @@ function Pekle(req, res){
         }
 
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Plaka Pistele
 function Plistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var sql = "SELECT * from plakalar;"   
     con.query(sql, function (error, results) {
@@ -1018,7 +1139,6 @@ function Plistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //Bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -1042,10 +1162,20 @@ function Plistele(req, res){
             res.json(bilgiler);  
         }
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Plaka Püncelle
 function Pguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Plaka = data.Plaka;
@@ -1092,7 +1222,6 @@ function Pguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1109,10 +1238,20 @@ function Pguncelle(req, res){
         }
 
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Plaka Psil
 function Psil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -1152,7 +1291,6 @@ function Psil(req, res){
                         }
                     });
                 }
-                console.log("Kayıt Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1169,12 +1307,22 @@ function Psil(req, res){
         }
 
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //--------------------------------------------
 
 //Soru Ekle
 function Soruekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var Soru = data.SoruMetin;
     Soru = Soru.toUpperCase();
@@ -1203,7 +1351,6 @@ function Soruekle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1234,10 +1381,20 @@ function Soruekle(req, res){
         }
 
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Soru Listele
 function Sorulistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var sql = "SELECT * from sorular;"   
     con.query(sql, function (error, results) {
@@ -1251,7 +1408,6 @@ function Sorulistele(req, res){
             });
         }
         if(results.length == 0){ //Tablo boş ise
-                
             res.set({
                 'content-type': 'application/json',
                 'content-length': '100',
@@ -1266,7 +1422,6 @@ function Sorulistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -1287,10 +1442,20 @@ function Sorulistele(req, res){
             res.json(bilgiler);  
         }
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Soru Güncelle
 function Soruguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var Soru = data.SoruMetin;
@@ -1334,7 +1499,6 @@ function Soruguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1351,10 +1515,20 @@ function Soruguncelle(req, res){
         }
 
     });
+    
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Soru Sil
 function Sorusil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -1394,7 +1568,6 @@ function Sorusil(req, res){
                         }
                     });
                 }
-                console.log("Kayıt Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1411,12 +1584,22 @@ function Sorusil(req, res){
         }
 
     });
+   
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //--------------------------------------------
 
 //Yazi Ekle
 function Yekle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var PlakaID = data.PlakaID;
     var YazarID = data.YazarID;
@@ -1424,7 +1607,6 @@ function Yekle(req, res){
     var Yazi = data.Yazi;
     var Rep = 0;
     var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-
 
     var sql = "INSERT INTO ?? (??,??,??,??,??,??) VALUES (?,?,?,?,?,?)";
     var params = ['yazilar', 'PlakaID','YazarID', 'KonumID', 'Yazi', 'Rep', 'YazilmaTarih', PlakaID,YazarID,KonumID,Yazi,Rep,date];
@@ -1438,7 +1620,6 @@ function Yekle(req, res){
                 }
             });
         }
-        console.log("Veritabanina yazildi");
         res.set({
             'content-type': 'application/json',
             'content-length': '100',
@@ -1452,11 +1633,21 @@ function Yekle(req, res){
         }
         res.json(reply);
     });    
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
        
 }
 
 //Yazi Listele
 function Ylistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var sql = "SELECT * from yazilar;"   
     con.query(sql, function (error, results) {
@@ -1484,7 +1675,6 @@ function Ylistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -1510,10 +1700,20 @@ function Ylistele(req, res){
             res.json(bilgiler);  
         }
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Yazi Güncelle
 function Yguncelle(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
     var PlakaID = data.PlakaID;
@@ -1559,7 +1759,6 @@ function Yguncelle(req, res){
                         }
                     });
                 }
-                console.log("Veritabanina yazildi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1574,12 +1773,21 @@ function Yguncelle(req, res){
                 res.json(reply);
             });    
         }
-
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //Yazi Sil
 function Ysil(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
     var ID = data.ID;
 
@@ -1619,7 +1827,6 @@ function Ysil(req, res){
                         
                     });
                 }
-                console.log("Kayıt Silindi");
                 res.set({
                     'content-type': 'application/json',
                     'content-length': '100',
@@ -1634,16 +1841,25 @@ function Ysil(req, res){
                 res.json(reply);
             });    
         }
-
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
 
 //--------------------------------------------
 
 //İller Listele
 function Ilistele(req, res){
+
+    var con = GetConnection();
+    con.connect(function(err, q) {
+        if (err) throw err;
+      });
+
     var data = req.params;
-    var sql = "SELECT * from Iller;"   
+    var sql = "SELECT * from Iller"   
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
@@ -1655,7 +1871,6 @@ function Ilistele(req, res){
             });
         }
         if(results.length == 0){ //Tablo boş ise
-                
             res.set({
                 'content-type': 'application/json',
                 'content-length': '100',
@@ -1669,7 +1884,6 @@ function Ilistele(req, res){
             });        
         }
         else{ //Tablo dolu ise
-            console.log("Tablo dolu");
             //kullanıcı bilgilerinin alınması
             res.set({
                 'content-type': 'application/json',
@@ -1690,4 +1904,8 @@ function Ilistele(req, res){
             res.json(bilgiler);  
         }
     });
+
+    con.end(function(err, q) {
+        if (err) throw err;
+      });
 }
