@@ -40,7 +40,7 @@ app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi
 app.get('/Ysil/:ID',Ysil);//Yazi sil
 
 app.get('/Ilistele',Ilistele);//İller Listele
-
+/*
 function GetConnection(){
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -50,7 +50,7 @@ var con = mysql.createConnection({
   });
   return con;
 }
-/*
+ */
 function GetConnection(){
     var con = mysql.createConnection({
         host: "127.0.0.1",
@@ -60,7 +60,7 @@ function GetConnection(){
       });
     return con;
 }
- */
+
 function listening(){
      console.log("Listening..");   
 
@@ -109,6 +109,12 @@ function Kekle(req, res){
             });
         }
         if(results.length == 0){ //aynı mail adresinden yoksa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+            });
+
             var sql = "INSERT INTO ?? (??,??,??,??,??,??) VALUES (?,?,?,?,?,?)";
             var params = ['uyeler', 'K_Adi', 'K_Sifre', 'K_Mail', 'K_Soru', 'K_Cevap', 'FirstLogin', K_Adi, K_Parola, K_Mail, K_Soru, K_Cevap, date];
             sql = mysql.format(sql, params);  
@@ -133,7 +139,12 @@ function Kekle(req, res){
                     } //Veritabanına eklendi
                 }
                 res.json(reply);
-            });    
+            }); 
+            
+            con.end(function(err, q) {
+                if (err) throw err;
+            });
+            
         }
         else{
             res.set({
@@ -351,6 +362,12 @@ function Kguncelle(req, res){
             });
         }
         else{ // Kullanıcı varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "select * from uyeler where (K_Mail ='"+K_Mail+"' or K_Adi = '"+K_Adi+"') AND NOT ID="+ID;
             con.query(sql, function (error, results) {
                 if (error){
@@ -376,36 +393,50 @@ function Kguncelle(req, res){
                     });
                 }
                 else{
-            var sql = "UPDATE uyeler SET Admin = '" + Admin + "', K_Adi = '" + K_Adi + "', K_Rep = '" + K_Rep + "', K_Mail = '" + K_Mail + "', K_Soru = '" + K_Soru + "', K_Cevap = '" + K_Cevap + "'"+((bosmu)?"":", K_Sifre = '" + K_Parola + "'")+" where ID ='" + ID + "'";
-            con.query(sql, function (error, results) {
-                if (error){
-                    return res.send({
-                        "message":
-                        {
-                            "durum" : "99" //Sql hatası
-                        }
+                    var con = GetConnection();
+                    con.connect(function(err, q) {
+                        if (err) throw err;
                     });
-                }
-                res.set({
-                    'content-type': 'application/json',
-                    'content-length': '100',
-                    'warning': "with content type charset encoding will be added by default"
-                 });
-                reply = {
-                    "message":
-                    {
-                        "durum" : "basarili" 
-                    } //Güncelleme işlemi başarılı
-                }
-                res.json(reply);
-            });
-        }    
-    });
 
-    }});
+                    var sql = "UPDATE uyeler SET Admin = '" + Admin + "', K_Adi = '" + K_Adi + "', K_Rep = '" + K_Rep + "', K_Mail = '" + K_Mail + "', K_Soru = '" + K_Soru + "', K_Cevap = '" + K_Cevap + "'"+((bosmu)?"":", K_Sifre = '" + K_Parola + "'")+" where ID ='" + ID + "'";
+                    con.query(sql, function (error, results) {
+                        if (error){
+                            return res.send({
+                                "message":
+                                {
+                                    "durum" : "99" //Sql hatası
+                                }
+                            });
+                        }
+                        res.set({
+                            'content-type': 'application/json',
+                            'content-length': '100',
+                            'warning': "with content type charset encoding will be added by default"
+                        });
+                        reply = {
+                            "message":
+                            {
+                                "durum" : "basarili" 
+                            } //Güncelleme işlemi başarılı
+                        }
+                        res.json(reply);
+                    });
+
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                }  
+            });
+            
+            con.end(function(err, q) {
+                if (err) throw err;
+            });
+            
+        }
+    });
     con.end(function(err, q) {
         if (err) throw err;
-      });
+    });
 }
 
 //Kullanıcı Sil
@@ -444,6 +475,12 @@ function Ksil(req, res){
             });
         }
         else{ // Kullanıcı varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "DELETE FROM uyeler where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
@@ -468,6 +505,10 @@ function Ksil(req, res){
                 res.json(reply);
             });    
         }
+
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
 
     });
     con.end(function(err, q) {
@@ -501,6 +542,12 @@ function Cekle(req, res){
             });
         }
         if(results.length == 0){ //Cins Yoksa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "INSERT INTO ?? (??) VALUES (?)";
             var params = ['cinsler', 'AracCins', Cins];
             sql = mysql.format(sql, params);  
@@ -541,6 +588,10 @@ function Cekle(req, res){
                 // 1 : Cins var
             });
         }
+
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
 
     });
 
@@ -648,6 +699,12 @@ function Cguncelle(req, res){
             });
         }
         else{ // Kullanıcı varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "UPDATE cinsler SET AracCins = ? where ID = ?";
             params = [Cins,ID];
             sql = mysql.format(sql, params);
@@ -672,6 +729,11 @@ function Cguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -717,6 +779,12 @@ function Csil(req, res){
             });
         }
         else{ // Cins varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "DELETE FROM cinsler where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
@@ -739,6 +807,11 @@ function Csil(req, res){
                     } //Silme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -776,6 +849,12 @@ function Tekle(req, res){
             });
         }
         if(results.length == 0){ //Tür Yoksa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "INSERT INTO ?? (??,??) VALUES (?,?)";
             var params = ['turler', 'CinsID', 'TurAdi', cinsID, tur];
             sql = mysql.format(sql, params);  
@@ -800,6 +879,11 @@ function Tekle(req, res){
                     } //Veritabanına eklendi
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
         else{
@@ -925,6 +1009,12 @@ function Tguncelle(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "UPDATE turler SET CinsID = ?, TurAdi = ? where ID = ?";
             params = [Cins,tur,ID];
             sql = mysql.format(sql, params);
@@ -949,6 +1039,11 @@ function Tguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -995,6 +1090,12 @@ function Tsil(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "DELETE FROM turler where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
@@ -1017,6 +1118,11 @@ function Tsil(req, res){
                     } //Silme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -1057,6 +1163,12 @@ function Pekle(req, res){
             });
         }
         if(results.length == 0){ //Kayıt Yoksa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
             var params = ['plakalar','Plaka', 'CinsID', 'TurID', 'AracRengi',Plaka, CinsID, TurID, AracRengi];
             sql = mysql.format(sql, params);  
@@ -1081,6 +1193,11 @@ function Pekle(req, res){
                     } //Veritabanına eklendi
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
         else{
@@ -1211,6 +1328,12 @@ function Pguncelle(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "UPDATE plakalar SET Plaka = ?, CinsID = ?, TurID = ?, AracRengi = ? where ID = ?";
             params = [Plaka,CinsID,TurID,AracRengi,ID];
             sql = mysql.format(sql, params);
@@ -1235,6 +1358,11 @@ function Pguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -1282,6 +1410,12 @@ function Psil(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "DELETE FROM plakalar where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
@@ -1304,6 +1438,11 @@ function Psil(req, res){
                     } //Silme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -1340,6 +1479,12 @@ function Soruekle(req, res){
             });
         }
         if(results.length == 0){ //Kayıt Yoksa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "INSERT INTO ?? (??) VALUES (?)";
             var params = ['sorular', 'SoruMetin', Soru];
             sql = mysql.format(sql, params);  
@@ -1364,6 +1509,11 @@ function Soruekle(req, res){
                     } //Veritabanına eklendi
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
         else{
@@ -1488,6 +1638,12 @@ function Soruguncelle(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "UPDATE sorular SET SoruMetin = ? where ID = ?";
             params = [Soru,ID];
             sql = mysql.format(sql, params);
@@ -1512,6 +1668,11 @@ function Soruguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
+
+                con.end(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -1558,7 +1719,13 @@ function Sorusil(req, res){
                 // 8 :  Bulunamadı
             });
         }
-        else{ // Cins varsa
+        else{ // Soru varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+              });
+
             var sql = "DELETE FROM sorular where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
@@ -1581,6 +1748,12 @@ function Sorusil(req, res){
                     } //Silme işlemi başarılı
                 }
                 res.json(reply);
+
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                  });
+
             });    
         }
 
@@ -1617,7 +1790,7 @@ function Yekle(req, res){
             return res.send({
                 "message":
                 {
-                    "durum" : "99" //Sql hatası
+                    "durum" : error //Sql hatası
                 }
             });
         }
@@ -1748,6 +1921,12 @@ function Yguncelle(req, res){
             });
         }
         else{ // Kayıt varsa
+
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+            });
+
             var sql = "UPDATE yazilar SET PlakaID = ?, YazarID = ?, KonumID = ?, Yazi = ?, Rep = ? where ID = ?";
             params = [PlakaID,YazarID,KonumID,Yazi,Rep,ID];
             sql = mysql.format(sql, params);
@@ -1772,6 +1951,10 @@ function Yguncelle(req, res){
                     } //Güncelleme işlemi başarılı
                 }
                 res.json(reply);
+                con.end(function(err, q) {
+                    if (err) throw err;
+                });
+
             });    
         }
     });
@@ -1798,7 +1981,7 @@ function Ysil(req, res){
             res.send({
                 "message":
                 {
-                    "durum" : "99" //Sql hatası
+                    "durum" : "99 hata 1" //Sql hatası
                 }
 
             });
@@ -1817,7 +2000,13 @@ function Ysil(req, res){
             });
         }
         else{ // Cins varsa
-            var sql = "DELETE FROM yazilar where ID ='" + ID + "'";
+            
+            var con = GetConnection();
+            con.connect(function(err, q) {
+                if (err) throw err;
+            });
+            
+            var sql = "delete from yazilar where ID ='" + ID + "'";
             con.query(sql, function (error, results) {
                 if (error){
                     return res.send({
@@ -1839,7 +2028,13 @@ function Ysil(req, res){
                         "durum" : "basarili" //silme işlemi başarılı
                     }
                 }
+
                 res.json(reply);
+                
+                con.end(function(err, q) {
+                    if (err) throw err;
+                });
+                
             });    
         }
     });
