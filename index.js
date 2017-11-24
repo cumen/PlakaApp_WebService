@@ -40,6 +40,10 @@ app.get('/Yguncelle/:ID/:PlakaID/:YazarID/:KonumID/:Yazi/:Rep',Yguncelle);//Yazi
 app.get('/Ysil/:ID',Ysil);//Yazi sil
 
 app.get('/Ilistele',Ilistele);//İller Listele
+
+app.get('/Takiplistele',Takiplistele);//Takip Listele
+app.get('/Takipekle/:UyeID/:PlakaID',Takipekle);//Takip Ekle
+app.get('/Takipsil/:UyeID/:PlakaID',Takipsil);//Takip sil
 /*
 function GetConnection(){
 var con = mysql.createConnection({
@@ -2104,4 +2108,193 @@ function Ilistele(req, res){
     con.end(function(err, q) {
         if (err) throw err;
       });
+}
+
+//--------------------------------------------
+
+//Takip Ekle
+function Takipekle(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var UyeID = data.UyeID;
+        var PlakaID = data.PlakaID;
+        var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    
+        var sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
+        var params = ['takip', 'Uye_ID','Plaka_ID', 'SonBakma', UyeID,PlakaID,date];
+        sql = mysql.format(sql, params);  
+        con.query(sql, function (error, results) {
+            if (error){
+                return res.send({
+                    "message":
+                    {
+                        "durum" : error //Sql hatası
+                    }
+                });
+            }
+            res.set({
+                'content-type': 'application/json',
+                'content-length': '100',
+                'warning': "with content type charset encoding will be added by default"
+                });
+            reply = {
+                "message":
+                {
+                    "durum" : "basarili" //Veritabanına yazıldı
+                }
+            }
+            res.json(reply);
+        });    
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
+           
+}
+
+//Takip Listele
+function Takiplistele(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var sql = "SELECT * from takip"   
+        con.query(sql, function (error, results) {
+            if (error){
+                return res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Tablo boş ise
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamadı
+                    }
+                });        
+            }
+            else{ //Tablo dolu ise
+                //kullanıcı bilgilerinin alınması
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                });
+                var bilgiler = [];
+                for (var key in results) {
+                    var item={
+                        "message" : {
+                            "Uye_ID" : results[key].Uye_ID,
+                            "Plaka_ID" : results[key].Plaka_ID,
+                            "SonBakma" : results[key].SonBakma,
+                            "durum" : "basarili"
+                        }
+                    }
+                    bilgiler.push(item);
+                }
+                res.json(bilgiler);  
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
+}
+
+//Takip Sil
+function Takipsil(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var UyeID = data.UyeID;
+        var PlakaID = data.PlakaID;
+    
+        var sql = "SELECT * from takip where Uye_ID ='" + UyeID + "' and Plaka_ID = '" + PlakaID + "'";
+        con.query(sql, function (error, results) {
+            if (error){
+                res.send({
+                    "message":
+                    {
+                        "durum" : "99 hata 1" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Kayıt yoksa
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamdı
+                    }
+                });
+            }
+            else{ // Cins varsa
+                
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                });
+                
+                var sql = "delete from takip where Uye_ID ='" + UyeID + "' and Plaka_ID = '" + PlakaID + "'";
+                con.query(sql, function (error, results) {
+                    if (error){
+                        return res.send({
+                            "message":
+                            {
+                                "durum" : "99" //sql hatası
+                            }
+                            
+                        });
+                    }
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    reply = {
+                        "message":
+                        {
+                            "durum" : "basarili" //silme işlemi başarılı
+                        }
+                    }
+    
+                    res.json(reply);
+                    
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                    
+                });    
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+        });
 }
