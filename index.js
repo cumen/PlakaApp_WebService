@@ -44,7 +44,7 @@ app.get('/Ilistele',Ilistele);//İller Listele
 app.get('/Takiplistele',Takiplistele);//Takip Listele
 app.get('/Takipekle/:UyeID/:PlakaID',Takipekle);//Takip Ekle
 app.get('/Takipsil/:UyeID/:PlakaID',Takipsil);//Takip sil
-/*
+
 function GetConnection(){
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -54,7 +54,9 @@ var con = mysql.createConnection({
   });
   return con;
 }
- */
+ 
+
+ /*
 function GetConnection(){
     var con = mysql.createConnection({
         host: "127.0.0.1",
@@ -64,7 +66,7 @@ function GetConnection(){
       });
     return con;
 }
-
+*/
 function listening(){
      console.log("Listening..");   
 
