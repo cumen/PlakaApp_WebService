@@ -28,6 +28,7 @@ app.get('/Pekle/:Plaka/:CinsID/:TurID/:AracRengi',Pekle);//Plaka Ekle
 app.get('/Plistele',Plistele);//Plaka Listele
 app.get('/Pguncelle/:ID/:Plaka/:CinsID/:TurID/:AracRengi',Pguncelle);//Plaka Güncelle
 app.get('/Psil/:ID',Psil);//Plaka sil
+app.get('/Psorgula/:Plaka',Psorgula);//Plaka sorgula
 
 app.get('/Soruekle/:SoruMetin',Soruekle);//Soru Ekle
 app.get('/Sorulistele',Sorulistele);//Soru Listele
@@ -58,7 +59,7 @@ var con = mysql.createConnection({
 }
  
 
- /*
+/*
 function GetConnection(){
     var con = mysql.createConnection({
         host: "127.0.0.1",
@@ -69,6 +70,7 @@ function GetConnection(){
     return con;
 }
 */
+ 
 function listening(){
      console.log("Listening..");   
 
@@ -1238,7 +1240,7 @@ function Plistele(req, res){
       });
 
     var data = req.params;
-    var sql = "SELECT * from plakalar;"   
+    var sql = "SELECT * from plakalar";   
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
@@ -1460,6 +1462,69 @@ function Psil(req, res){
         if (err) throw err;
       });
 }
+
+//Plaka Sorgula
+function Psorgula(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+        
+        var data = req.params;
+        var Plaka = data.Plaka;
+
+        var sql = "SELECT count(*) as 'yazisayisi' from yazilar where PlakaID = (Select ID from plakalar where Plaka = '" + Plaka + "')";   
+        con.query(sql, function (error, results) {
+            if (error){
+                return res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Tablo boş ise
+                    
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" 
+                    }
+                    // 8 : Hiç Kulanıcı Yok
+                });        
+            }
+            else{ //Tablo dolu ise
+                //Bilgilerinin alınması
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                });
+                var bilgiler = [];
+                for (var key in results) {
+                    var item={
+                        "message" : {
+                            "yazisayisi" : results[key].yazisayisi,
+                            "durum" : "basarili"                       
+                        }
+                    }
+                    bilgiler.push(item);
+                }
+                res.json(bilgiler);  
+            }
+        });
+        
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
+    }
 
 //--------------------------------------------
 
