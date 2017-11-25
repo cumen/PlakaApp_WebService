@@ -44,6 +44,8 @@ app.get('/Ilistele',Ilistele);//İller Listele
 app.get('/Takiplistele',Takiplistele);//Takip Listele
 app.get('/Takipekle/:UyeID/:PlakaID',Takipekle);//Takip Ekle
 app.get('/Takipsil/:UyeID/:PlakaID',Takipsil);//Takip sil
+app.get('/Takipguncelle/:UyeID/:PlakaID',Takipguncelle);//Takip güncelle
+
 
 function GetConnection(){
 var con = mysql.createConnection({
@@ -1796,7 +1798,7 @@ function Yekle(req, res){
             return res.send({
                 "message":
                 {
-                    "durum" : error //Sql hatası
+                    "durum" : "99" //Sql hatası
                 }
             });
         }
@@ -1987,7 +1989,7 @@ function Ysil(req, res){
             res.send({
                 "message":
                 {
-                    "durum" : "99 hata 1" //Sql hatası
+                    "durum" : "99" //Sql hatası
                 }
 
             });
@@ -2135,7 +2137,7 @@ function Takipekle(req, res){
                 return res.send({
                     "message":
                     {
-                        "durum" : error //Sql hatası
+                        "durum" : "99" //Sql hatası
                     }
                 });
             }
@@ -2238,7 +2240,7 @@ function Takipsil(req, res){
                 res.send({
                     "message":
                     {
-                        "durum" : "99 hata 1" //Sql hatası
+                        "durum" : "99" //Sql hatası
                     }
     
                 });
@@ -2270,6 +2272,89 @@ function Takipsil(req, res){
                             "message":
                             {
                                 "durum" : "99" //sql hatası
+                            }
+                            
+                        });
+                    }
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    reply = {
+                        "message":
+                        {
+                            "durum" : "basarili" //silme işlemi başarılı
+                        }
+                    }
+    
+                    res.json(reply);
+                    
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                    
+                });    
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+        });
+}
+
+//Takip Güncelle
+function Takipguncelle(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var UyeID = data.UyeID;
+        var PlakaID = data.PlakaID;
+        var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    
+        var sql = "SELECT * from takip where Uye_ID ='" + UyeID + "' and Plaka_ID = '" + PlakaID + "'";
+        con.query(sql, function (error, results) {
+            if (error){
+                res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Kayıt yoksa
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamdı
+                    }
+                });
+            }
+            else{ // Cins varsa
+                
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                });
+                
+                var sql = "UPDATE takip SET SonBakma = '" + date + "' where Plaka_ID = '" + PlakaID + "' and Uye_ID = '" + UyeID + "'";
+              
+                con.query(sql, function (error, results) {
+                    if (error){
+                        return res.send({
+                            "message":
+                            {
+                                "durum" : error //sql hatası
                             }
                             
                         });
