@@ -1896,7 +1896,7 @@ function Ylistele(req, res){
       });
 
     var data = req.params;
-    var sql = "SELECT * from yazilar;"   
+    var sql = "SELECT * from yazilar ORDER BY YazilmaTarih DESC;"   
     con.query(sql, function (error, results) {
         if (error){
             return res.send({
