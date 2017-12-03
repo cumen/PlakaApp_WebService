@@ -847,7 +847,7 @@ function Tekle(req, res){
     var tur = data.TurAdi;
     tur = tur.toUpperCase();
 
-    var sql = "SELECT * from turler where TurAdi ='" + tur + "'";
+    var sql = "SELECT * FROM `turler` WHERE TurAdi = '" + tur + "' and CinsID = " + cinsID + "";
     con.query(sql, function (error, results) {
         if (error){
             res.send({
