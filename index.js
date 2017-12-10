@@ -47,6 +47,12 @@ app.get('/Takipekle/:UyeID/:PlakaID',Takipekle);//Takip Ekle
 app.get('/Takipsil/:UyeID/:PlakaID',Takipsil);//Takip sil
 app.get('/Takipguncelle/:UyeID/:PlakaID',Takipguncelle);//Takip güncelle
 
+app.get('/Repguncelle/:UyeID/:Rep',Repguncelle);//Rep güncelle
+
+app.get('/Sikayetlistele',Sikayetlistele);//Sikayet Listele
+app.get('/Sikayetekle/:YaziID/:Nedeni',Sikayetekle);//Sikayet Ekle
+app.get('/Sikayetsil/:ID/',Sikayetsil);//Sikayet sil
+
 
 function GetConnection(){
 var con = mysql.createConnection({
@@ -57,7 +63,7 @@ var con = mysql.createConnection({
   });
   return con;
 }
- 
+
 
 /*
 function GetConnection(){
@@ -75,6 +81,7 @@ function listening(){
      console.log("Listening..");   
 
 }
+
 //--------------------------------------------
 
 /*
@@ -2419,7 +2426,280 @@ function Takipguncelle(req, res){
                         return res.send({
                             "message":
                             {
-                                "durum" : error //sql hatası
+                                "durum" : "99" //sql hatası
+                            }
+                            
+                        });
+                    }
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    reply = {
+                        "message":
+                        {
+                            "durum" : "basarili" //silme işlemi başarılı
+                        }
+                    }
+    
+                    res.json(reply);
+                    
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                    
+                });    
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+        });
+}
+
+//--------------------------------------------
+
+//Rep Güncelle
+function Repguncelle(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var UyeID = data.UyeID;
+        var Rep = data.Rep;
+    
+        var sql = "SELECT * from uyeler where ID =" + UyeID + "";
+        con.query(sql, function (error, results) {
+            if (error){
+                res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Kayıt yoksa
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamdı
+                    }
+                });
+            }
+            else{ // Cins varsa
+                
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                });
+                
+                var sql = "UPDATE uyeler SET K_Rep = '" + Rep + "' where ID = '" + UyeID + "'";
+              
+                con.query(sql, function (error, results) {
+                    if (error){
+                        return res.send({
+                            "message":
+                            {
+                                "durum" : "99" //sql hatası
+                            }
+                            
+                        });
+                    }
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    reply = {
+                        "message":
+                        {
+                            "durum" : "basarili" //silme işlemi başarılı
+                        }
+                    }
+    
+                    res.json(reply);
+                    
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                    
+                });    
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+        });
+}
+
+//--------------------------------------------
+
+//Sikayet Ekle
+function Sikayetekle(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var YaziID = data.YaziID;
+        var Nedeni = data.Nedeni;
+        var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    
+        var sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
+        var params = ['sikayet', 'YaziID','Nedeni', 'Tarih', YaziID,Nedeni,date];
+        sql = mysql.format(sql, params);  
+        con.query(sql, function (error, results) {
+            if (error){
+                return res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+                });
+            }
+            res.set({
+                'content-type': 'application/json',
+                'content-length': '100',
+                'warning': "with content type charset encoding will be added by default"
+                });
+            reply = {
+                "message":
+                {
+                    "durum" : "basarili" //Veritabanına yazıldı
+                }
+            }
+            res.json(reply);
+        });    
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
+           
+}
+
+//Sikayet Listele
+function Sikayetlistele(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var sql = "SELECT * from sikayet"   
+        con.query(sql, function (error, results) {
+            if (error){
+                return res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Tablo boş ise
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamadı
+                    }
+                });        
+            }
+            else{ //Tablo dolu ise
+                //kullanıcı bilgilerinin alınması
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                });
+                var bilgiler = [];
+                for (var key in results) {
+                    var item={
+                        "message" : {
+                            "ID" : results[key].ID,
+                            "YaziID" : results[key].YaziID,
+                            "Nedeni" : results[key].Nedeni,
+                            "Taih" : results[key].Tarih,
+                            "durum" : "basarili"
+                        }
+                    }
+                    bilgiler.push(item);
+                }
+                res.json(bilgiler);  
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+          });
+}
+
+//Sikayet Sil
+function Sikayetsil(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var ID = data.ID;
+    
+        var sql = "SELECT * from sikayet where ID =" + ID + "";
+        con.query(sql, function (error, results) {
+            if (error){
+                res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Kayıt yoksa
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamdı
+                    }
+                });
+            }
+            else{ // Cins varsa
+                
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                });
+                
+                var sql = "delete from sikayet where ID =" + ID + "";
+                con.query(sql, function (error, results) {
+                    if (error){
+                        return res.send({
+                            "message":
+                            {
+                                "durum" : "99" //sql hatası
                             }
                             
                         });
