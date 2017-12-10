@@ -52,6 +52,7 @@ app.get('/Repguncelle/:UyeID/:Rep',Repguncelle);//Rep güncelle
 app.get('/Sikayetlistele',Sikayetlistele);//Sikayet Listele
 app.get('/Sikayetekle/:YaziID/:Nedeni',Sikayetekle);//Sikayet Ekle
 app.get('/Sikayetsil/:ID/',Sikayetsil);//Sikayet sil
+app.get('/Sikayetban/:ID/:Rep',Sikayetban);//Sikayetban
 
 
 function GetConnection(){
@@ -2700,6 +2701,88 @@ function Sikayetsil(req, res){
                             "message":
                             {
                                 "durum" : "99" //sql hatası
+                            }
+                            
+                        });
+                    }
+                    res.set({
+                        'content-type': 'application/json',
+                        'content-length': '100',
+                        'warning': "with content type charset encoding will be added by default"
+                     });
+                    reply = {
+                        "message":
+                        {
+                            "durum" : "basarili" //silme işlemi başarılı
+                        }
+                    }
+    
+                    res.json(reply);
+                    
+                    con.end(function(err, q) {
+                        if (err) throw err;
+                    });
+                    
+                });    
+            }
+        });
+    
+        con.end(function(err, q) {
+            if (err) throw err;
+        });
+}
+
+//Sikayet Ban
+function Sikayetban(req, res){
+    
+        var con = GetConnection();
+        con.connect(function(err, q) {
+            if (err) throw err;
+          });
+    
+        var data = req.params;
+        var ID = data.ID;
+        var Rep = data.Rep;
+    
+        var sql = "SELECT * from sikayet where ID =" + ID + "";
+        con.query(sql, function (error, results) {
+            if (error){
+                res.send({
+                    "message":
+                    {
+                        "durum" : "99" //Sql hatası
+                    }
+    
+                });
+            }
+            if(results.length == 0){ //Kayıt yoksa
+                res.set({
+                    'content-type': 'application/json',
+                    'content-length': '100',
+                    'warning': "with content type charset encoding will be added by default"
+                 });
+                res.json({
+                    "message":
+                    {
+                        "durum" : "8" //Kayıt bulunamdı
+                    }
+                });
+            }
+            else{ // Cins varsa
+                
+                var con = GetConnection();
+                con.connect(function(err, q) {
+                    if (err) throw err;
+                });
+                
+                var sql = "update uyeler SET K_Rep = " + Rep + " WHERE ID = (SELECT YazarID FROM yazilar where ID = (SELECT YaziID from sikayet where ID =" + ID +"))";
+              
+                con.query(sql, function (error, results) {
+                    if (error){
+                        return res.send({
+                            "message":
+                            {
+                                "durum" : "999" //sql hatası
                             }
                             
                         });
